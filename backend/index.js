@@ -11,6 +11,7 @@ const connectDB = require('./config/db');
 const productRoutes = require('./routes/productRoutes');
 const umkmRoutes = require('./routes/umkmRoutes');
 const authRoutes = require('./routes/authRoutes');
+const uploadRequestRoutes = require('./routes/uploadRequestRoutes');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -47,6 +48,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/products', productRoutes);
 app.use('/api/umkm', umkmRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/uploadrequests', uploadRequestRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

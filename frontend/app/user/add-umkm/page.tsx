@@ -1,27 +1,14 @@
 "use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import UserLayout from "../../../components/UserLayout";
+import { Building2, Save, ArrowLeft, CheckCircle, AlertCircle, Globe } from "lucide-react";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Layout from '@/components/Layout';
-import { 
-  Building2, 
-  Save, 
-  ArrowLeft,
-  CheckCircle,
-  AlertCircle,
-  User,
-  MapPin,
-  Phone,
-  Mail,
-  Globe
-} from 'lucide-react';
-
-export default function AddUMKM() {
+export default function AddUserUMKM() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -43,7 +30,6 @@ export default function AddUMKM() {
       website: ''
     }
   });
-
   const [errors, setErrors] = useState({});
 
   const categories = [
@@ -57,8 +43,7 @@ export default function AddUMKM() {
   ];
 
   const validateForm = () => {
-    const newErrors = {};
-
+    const newErrors: any = {};
     if (!formData.name.trim()) newErrors.name = 'Nama UMKM wajib diisi';
     if (!formData.description.trim()) newErrors.description = 'Deskripsi wajib diisi';
     if (!formData.category) newErrors.category = 'Kategori wajib dipilih';
@@ -66,26 +51,21 @@ export default function AddUMKM() {
     if (!formData.contact.name.trim()) newErrors.contactName = 'Nama kontak wajib diisi';
     if (!formData.contact.phone.trim()) newErrors.contactPhone = 'Nomor telepon wajib diisi';
     if (!formData.contact.address.trim()) newErrors.contactAddress = 'Alamat wajib diisi';
-    
     if (formData.contact.email && !/\S+@\S+\.\S+/.test(formData.contact.email)) {
       newErrors.contactEmail = 'Format email tidak valid';
     }
-    
     if (formData.establishedYear && (formData.establishedYear < 1900 || formData.establishedYear > new Date().getFullYear())) {
       newErrors.establishedYear = 'Tahun berdiri tidak valid';
     }
-    
     if (formData.employeeCount && formData.employeeCount < 1) {
       newErrors.employeeCount = 'Jumlah karyawan harus minimal 1';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
-    
     if (name.startsWith('contact.')) {
       const contactField = name.split('.')[1];
       setFormData(prev => ({
@@ -110,8 +90,6 @@ export default function AddUMKM() {
         [name]: value
       }));
     }
-
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -120,39 +98,32 @@ export default function AddUMKM() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setLoading(true);
     setError('');
-
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/umkm`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/uploadrequests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          type: "umkm",
+          data: formData
+        }),
       });
-
       const data = await response.json();
-
       if (data.success) {
         setSuccess(true);
-        setTimeout(() => {
-          router.push('/admin');
-        }, 2000);
+        setTimeout(() => router.push('/user'), 1500);
       } else {
-        setError(data.message || 'Terjadi kesalahan saat menyimpan UMKM');
+        setError(data.message || 'Gagal submit UMKM');
       }
-    } catch (error) {
-      console.error('Error creating UMKM:', error);
+    } catch (err) {
       setError('Terjadi kesalahan saat menghubungi server');
     } finally {
       setLoading(false);
@@ -161,7 +132,7 @@ export default function AddUMKM() {
 
   if (success) {
     return (
-      <Layout title="UMKM Berhasil Ditambahkan">
+      <UserLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full mx-4 text-center">
             <div className="bg-blue-100 rounded-full p-3 w-16 h-16 mx-auto mb-4">
@@ -169,22 +140,19 @@ export default function AddUMKM() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Berhasil!</h2>
             <p className="text-gray-600 mb-4">
-              UMKM "{formData.name}" berhasil ditambahkan ke database.
+              UMKM "{formData.name}" berhasil diajukan. Menunggu ACC admin.
             </p>
             <p className="text-sm text-gray-500">
               Anda akan diarahkan ke dashboard dalam beberapa detik...
             </p>
           </div>
         </div>
-      </Layout>
+      </UserLayout>
     );
   }
 
   return (
-    <Layout 
-      title="Tambah UMKM Baru"
-      description="Tambahkan UMKM baru ke dalam database"
-    >
+    <UserLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow-sm border-b border-gray-200">
@@ -197,8 +165,8 @@ export default function AddUMKM() {
                 <ArrowLeft className="h-5 w-5" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Tambah UMKM Baru</h1>
-                <p className="text-gray-600 mt-1">Lengkapi informasi UMKM yang akan didaftarkan</p>
+                <h1 className="text-2xl font-bold text-gray-900">Ajukan UMKM Baru</h1>
+                <p className="text-gray-600 mt-1">Lengkapi informasi UMKM yang akan diajukan</p>
               </div>
             </div>
           </div>
@@ -232,9 +200,7 @@ export default function AddUMKM() {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.name ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name ? 'border-red-300' : 'border-gray-300'}`}
                     placeholder="Contoh: Warung Makan Sederhana"
                   />
                   {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name}</p>}
@@ -248,9 +214,7 @@ export default function AddUMKM() {
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.category ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.category ? 'border-red-300' : 'border-gray-300'}`}
                   >
                     <option value="">Pilih Kategori</option>
                     {categories.map((category) => (
@@ -271,9 +235,7 @@ export default function AddUMKM() {
                     value={formData.description}
                     onChange={handleInputChange}
                     rows={4}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.description ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description ? 'border-red-300' : 'border-gray-300'}`}
                     placeholder="Deskripsikan UMKM Anda dengan detail..."
                   />
                   {errors.description && <p className="text-red-600 text-sm mt-1">{errors.description}</p>}
@@ -305,9 +267,7 @@ export default function AddUMKM() {
                     name="village"
                     value={formData.village}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.village ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.village ? 'border-red-300' : 'border-gray-300'}`}
                     placeholder="Contoh: Desa Sukamaju"
                   />
                   {errors.village && <p className="text-red-600 text-sm mt-1">{errors.village}</p>}
@@ -324,9 +284,7 @@ export default function AddUMKM() {
                     onChange={handleInputChange}
                     min="1900"
                     max={new Date().getFullYear()}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.establishedYear ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.establishedYear ? 'border-red-300' : 'border-gray-300'}`}
                     placeholder="2020"
                   />
                   {errors.establishedYear && <p className="text-red-600 text-sm mt-1">{errors.establishedYear}</p>}
@@ -342,10 +300,8 @@ export default function AddUMKM() {
                     value={formData.employeeCount}
                     onChange={handleInputChange}
                     min="1"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.employeeCount ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="5"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.employeeCount ? 'border-red-300' : 'border-gray-300'}`}
+                    placeholder="Contoh: 5"
                   />
                   {errors.employeeCount && <p className="text-red-600 text-sm mt-1">{errors.employeeCount}</p>}
                 </div>
@@ -354,10 +310,7 @@ export default function AddUMKM() {
 
             {/* Contact Information */}
             <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-              <div className="flex items-center space-x-2 mb-6">
-                <User className="h-5 w-5 text-green-600" />
-                <h2 className="text-xl font-semibold text-gray-900">Informasi Kontak</h2>
-              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Informasi Kontak</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -369,9 +322,7 @@ export default function AddUMKM() {
                     name="contact.name"
                     value={formData.contact.name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.contactName ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.contactName ? 'border-red-300' : 'border-gray-300'}`}
                     placeholder="Contoh: Bu Rina"
                   />
                   {errors.contactName && <p className="text-red-600 text-sm mt-1">{errors.contactName}</p>}
@@ -386,9 +337,7 @@ export default function AddUMKM() {
                     name="contact.phone"
                     value={formData.contact.phone}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.contactPhone ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.contactPhone ? 'border-red-300' : 'border-gray-300'}`}
                     placeholder="08123456789"
                   />
                   {errors.contactPhone && <p className="text-red-600 text-sm mt-1">{errors.contactPhone}</p>}
@@ -403,9 +352,7 @@ export default function AddUMKM() {
                     name="contact.email"
                     value={formData.contact.email}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.contactEmail ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.contactEmail ? 'border-red-300' : 'border-gray-300'}`}
                     placeholder="email@example.com"
                   />
                   {errors.contactEmail && <p className="text-red-600 text-sm mt-1">{errors.contactEmail}</p>}
@@ -420,9 +367,7 @@ export default function AddUMKM() {
                     name="contact.address"
                     value={formData.contact.address}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.contactAddress ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.contactAddress ? 'border-red-300' : 'border-gray-300'}`}
                     placeholder="Jl. Raya Desa No. 15"
                   />
                   {errors.contactAddress && <p className="text-red-600 text-sm mt-1">{errors.contactAddress}</p>}
@@ -519,7 +464,7 @@ export default function AddUMKM() {
                 ) : (
                   <>
                     <Save className="h-4 w-4" />
-                    <span>Simpan UMKM</span>
+                    <span>Ajukan UMKM</span>
                   </>
                 )}
               </button>
@@ -527,6 +472,6 @@ export default function AddUMKM() {
           </form>
         </div>
       </div>
-    </Layout>
+    </UserLayout>
   );
 }

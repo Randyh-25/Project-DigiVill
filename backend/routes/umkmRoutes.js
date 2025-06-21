@@ -6,8 +6,10 @@ const {
   createUMKM,
   updateUMKM,
   deleteUMKM,
-  getCategories
+  getCategories,
+  getUserUMKM
 } = require('../controllers/umkmController');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -61,5 +63,6 @@ router.get('/:id', getUMKM);
 router.post('/', umkmValidation, createUMKM);
 router.put('/:id', umkmValidation, updateUMKM);
 router.delete('/:id', deleteUMKM);
+router.get('/user', auth, getUserUMKM);
 
 module.exports = router;

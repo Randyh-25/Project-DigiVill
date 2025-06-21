@@ -83,7 +83,8 @@ const createUMKM = async (req, res) => {
       });
     }
 
-    const umkm = new UMKM(req.body);
+    const userId = req.user?.id;
+    const umkm = new UMKM({ ...req.body, user: userId });
     await umkm.save();
 
     res.status(201).json({
@@ -185,11 +186,23 @@ const getCategories = async (req, res) => {
   }
 };
 
+// Get UMKM by user
+const getUserUMKM = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const umkms = await UMKM.find({ user: userId });
+    res.json({ success: true, data: umkms });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Gagal mengambil UMKM user' });
+  }
+};
+
 module.exports = {
   getUMKMs,
   getUMKM,
   createUMKM,
   updateUMKM,
   deleteUMKM,
-  getCategories
+  getCategories,
+  getUserUMKM
 };

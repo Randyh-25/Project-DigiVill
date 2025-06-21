@@ -6,8 +6,10 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  getCategories
+  getCategories,
+  getUserProducts
 } = require('../controllers/productController');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -61,5 +63,6 @@ router.get('/:id', getProduct);
 router.post('/', productValidation, createProduct);
 router.put('/:id', productValidation, updateProduct);
 router.delete('/:id', deleteProduct);
+router.get('/user', auth, getUserProducts);
 
 module.exports = router;

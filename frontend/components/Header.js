@@ -1,38 +1,133 @@
 "use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { 
-  Menu, 
-  X, 
-  Home, 
-  Package, 
-  Building2, 
-  Settings,
+import {
+  Menu,
+  X,
+  Home,
+  Package,
+  Building2,
   Leaf,
-  ChevronDown
-} from 'lucide-react';
+  ChevronDown,
+  UserCircle,
+  LogOut,
+  LayoutDashboard,
+  LogIn,
+  UserPlus,
+} from "lucide-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [user, setUser] = useState(null);
   const router = useRouter();
-  const pathname = usePathname(); // Tambahkan ini
+  const pathname = usePathname();
+  const userMenuRef = useRef();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const name = localStorage.getItem("name");
+      setUser(token ? { role, name } : null);
+    }
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target)
+      ) {
+        setShowUserMenu(false);
+      }
+    }
+    if (showUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("name");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("admin_token");
+    setUser(null);
+    setShowUserMenu(false);
+    setIsMenuOpen(false);
+    router.replace("/");
+  };
 
   const navigation = [
-    { name: 'Beranda', href: '/', icon: Home },
-    { name: 'Produk', href: '/products', icon: Package },
-    { name: 'UMKM', href: '/umkm', icon: Building2 },
+    { name: "Beranda", href: "/", icon: Home },
+    { name: "Produk", href: "/products", icon: Package },
+    { name: "UMKM", href: "/umkm", icon: Building2 },
   ];
 
-  const adminNavigation = [
-    { name: 'Dashboard', href: '/admin' },
-    { name: 'Tambah Produk', href: '/admin/add-product' },
-    { name: 'Tambah UMKM', href: '/admin/add-umkm' },
-  ];
+  const isActive = (path) => pathname === path;
 
-  const isActive = (path) => pathname === path; // Ganti router.pathname jadi pathname
+  // User dropdown menu
+  const UserDropdown = ({ mobile = false }) => (
+    <div
+      className={`absolute ${mobile ? "left-0 mt-2" : "right-0 mt-2"} w-44 bg-white rounded-lg shadow-lg border border-gray-100 z-50`}
+      ref={userMenuRef}
+    >
+      {user ? (
+        <>
+          <Link
+            href={user.role === "admin" ? "/admin" : "/user"}
+            className="flex items-center px-4 py-3 hover:bg-green-50 text-gray-700"
+            onClick={() => {
+              setShowUserMenu(false);
+              setIsMenuOpen(false);
+            }}
+          >
+            <LayoutDashboard className="h-4 w-4 mr-2" />
+            Dashboard
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full px-4 py-3 hover:bg-red-50 text-red-600"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </button>
+        </>
+      ) : (
+        <>
+          <Link
+            href="/admin/register"
+            className="flex items-center px-4 py-3 hover:bg-green-50 text-gray-700"
+            onClick={() => {
+              setShowUserMenu(false);
+              setIsMenuOpen(false);
+            }}
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            Register
+          </Link>
+          <Link
+            href="/admin/login"
+            className="flex items-center px-4 py-3 hover:bg-green-50 text-gray-700"
+            onClick={() => {
+              setShowUserMenu(false);
+              setIsMenuOpen(false);
+            }}
+          >
+            <LogIn className="h-4 w-4 mr-2" />
+            Login
+          </Link>
+        </>
+      )}
+    </div>
+  );
 
   return (
     <header className="bg-white shadow-lg border-b border-green-100 sticky top-0 z-50">
@@ -45,7 +140,9 @@ const Header = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">Desa Digital</h1>
-              <p className="text-xs text-gray-500 hidden sm:block">Digitalisasi Produk Desa</p>
+              <p className="text-xs text-gray-500 hidden sm:block">
+                Digitalisasi Produk Desa
+              </p>
             </div>
           </Link>
 
@@ -59,8 +156,8 @@ const Header = () => {
                   href={item.href}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive(item.href)
-                      ? 'bg-green-100 text-green-700 shadow-sm'
-                      : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                      ? "bg-green-100 text-green-700 shadow-sm"
+                      : "text-gray-600 hover:text-green-600 hover:bg-green-50"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -68,8 +165,19 @@ const Header = () => {
                 </Link>
               );
             })}
-            
-            
+
+            {/* User Icon & Dropdown */}
+            <div className="relative ml-2">
+              <button
+                onClick={() => setShowUserMenu((v) => !v)}
+                className="flex items-center px-3 py-2 rounded-lg hover:bg-green-50 transition-all duration-200 focus:outline-none"
+                aria-label="User menu"
+              >
+                <UserCircle className="h-7 w-7 text-green-700" />
+                <ChevronDown className="h-4 w-4 text-gray-400 ml-1" />
+              </button>
+              {showUserMenu && <UserDropdown />}
+            </div>
           </nav>
 
           {/* Mobile menu button */}
@@ -93,8 +201,8 @@ const Header = () => {
                     href={item.href}
                     className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
                       isActive(item.href)
-                        ? 'bg-green-100 text-green-700'
-                        : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                        ? "bg-green-100 text-green-700"
+                        : "text-gray-600 hover:text-green-600 hover:bg-green-50"
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -103,8 +211,22 @@ const Header = () => {
                   </Link>
                 );
               })}
-              
-              
+
+              {/* User Icon & Dropdown (Mobile) */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu((v) => !v)}
+                  className="flex items-center w-full px-4 py-3 rounded-lg hover:bg-green-50 transition-all duration-200 focus:outline-none"
+                  aria-label="User menu"
+                >
+                  <UserCircle className="h-6 w-6 text-green-700" />
+                  <span className="ml-2 font-medium">
+                    {user?.name ? user.name : "Akun"}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-gray-400 ml-1" />
+                </button>
+                {showUserMenu && <UserDropdown mobile />}
+              </div>
             </nav>
           </div>
         )}

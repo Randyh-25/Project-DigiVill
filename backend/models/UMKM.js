@@ -72,6 +72,11 @@ const umkmSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
   }
 }, {
   timestamps: true

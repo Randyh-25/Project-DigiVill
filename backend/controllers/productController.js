@@ -82,7 +82,8 @@ const createProduct = async (req, res) => {
       });
     }
 
-    const product = new Product(req.body);
+    const userId = req.user?.id;
+    const product = new Product({ ...req.body, user: userId });
     await product.save();
 
     res.status(201).json({
@@ -184,11 +185,23 @@ const getCategories = async (req, res) => {
   }
 };
 
+// Get products by user
+const getUserProducts = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const products = await Product.find({ user: userId });
+    res.json({ success: true, data: products });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Gagal mengambil produk user' });
+  }
+};
+
 module.exports = {
   getProducts,
   getProduct,
   createProduct,
   updateProduct,
   deleteProduct,
-  getCategories
+  getCategories,
+  getUserProducts
 };

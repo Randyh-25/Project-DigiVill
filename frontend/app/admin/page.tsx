@@ -30,6 +30,7 @@ export default function AdminDashboard() {
     recentUMKM: []
   });
   const [loading, setLoading] = useState(true);
+  const [pending, setPending] = useState([]);
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
@@ -41,6 +42,15 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchDashboardData();
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/uploadrequests/pending`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setPending(data.data || []));
   }, []);
 
   const fetchDashboardData = async () => {
@@ -400,6 +410,59 @@ export default function AdminDashboard() {
                 <span className="font-medium text-gray-900">Kelola UMKM</span>
               </Link>
             </div>
+          </div>
+
+          {/* Pending Posts (User) */}
+          <div className="mt-8 bg-white rounded-xl shadow-md border border-gray-100 p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Pending Post (User)</h2>
+            {pending.length === 0 ? (
+              <p className="text-gray-500">Tidak ada post pending.</p>
+            ) : (
+              <ul className="space-y-4">
+                {pending.map((req: any) => (
+                  <li key={req._id} className="border rounded-lg p-4 flex justify-between items-center">
+                    <div>
+                      <div className="font-semibold">{req.data.name}</div>
+                      <div className="text-sm text-gray-500">{req.type.toUpperCase()} oleh {req.user?.name || req.user?.username}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                        onClick={async () => {
+                          const token = localStorage.getItem("token");
+                          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/uploadrequests/${req._id}/approve`, {
+                            method: "POST",
+                            headers: { Authorization: `Bearer ${token}` },
+                          });
+                          setPending((prev) => prev.filter((r) => r._id !== req._id));
+                        }}
+                      >
+                        Terima
+                      </button>
+                      <button
+                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        onClick={async () => {
+                          const reason = prompt("Alasan penolakan?");
+                          if (!reason) return;
+                          const token = localStorage.getItem("token");
+                          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/uploadrequests/${req._id}/reject`, {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({ reason }),
+                          });
+                          setPending((prev) => prev.filter((r) => r._id !== req._id));
+                        }}
+                      >
+                        Tolak
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>

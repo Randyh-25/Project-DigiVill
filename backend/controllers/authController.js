@@ -1,15 +1,44 @@
 const Login = require('../models/Login');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res) => {
   const { username, password } = req.body;
-  const user = await Login.findOne({ username });
-  if (!user) return res.status(401).json({ success: false, message: 'User not found' });
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+  // ekC admin
+  const admin = await Login.findOne({ username });
+  if (admin && await bcrypt.compare(password, admin.password)) {
+    const token = jwt.sign({ id: admin._id, username: admin.username, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return res.json({ success: true, token, role: 'admin', name: admin.username });
+  }
 
-  const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1d' });
-  res.json({ success: true, token });
+  // Cek user
+  const user = await User.findOne({ username });
+  if (user && await bcrypt.compare(password, user.password)) {
+    const token = jwt.sign({ id: user._id, username: user.username, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return res.json({ success: true, token, role: 'user', name: user.name, userId: user._id });
+  }
+
+  // Tidak ditemukan
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'Akun tidak ditemukan. Silakan register.' });
+  }
+
+  return res.status(401).json({ success: false, message: 'Password salah.' });
+};
+
+exports.register = async (req, res) => {
+  const { username, password, name } = req.body;
+  if (!username || !password || !name) {
+    return res.status(400).json({ success: false, message: 'Semua field wajib diisi.' });
+  }
+  const existing = await User.findOne({ username });
+  if (existing) {
+    return res.status(409).json({ success: false, message: 'Username sudah terdaftar.' });
+  }
+  const hashed = await bcrypt.hash(password, 10);
+  const user = new User({ username, password: hashed, name });
+  await user.save();
+  res.json({ success: true, message: 'Registrasi berhasil. Silakan login.' });
 };
