@@ -301,31 +301,6 @@ npm run lint
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Team
-
-- **Frontend Developer** - Next.js, React, Tailwind CSS
-- **Backend Developer** - Node.js, Express, MongoDB
-- **UI/UX Designer** - Design system, User experience
-- **DevOps Engineer** - Deployment, CI/CD
-
-## 📞 Support & Contact
-
-- **Email**: info@desadigital.id
-- **Website**: https://desadigital.id
-- **GitHub**: https://github.com/your-username/desa-digital
-- **Documentation**: [Wiki](https://github.com/your-username/desa-digital/wiki)
-
-## 🙏 Acknowledgments
-
-- Terima kasih kepada komunitas open source
-- Inspirasi dari gerakan digitalisasi UMKM Indonesia
-- Dukungan dari petani dan pengrajin lokal
-- Kontribusi dari developer community
-
 ---
 
-**Desa Digital** - Membangun Indonesia melalui digitalisasi produk desa dan pemberdayaan UMKM lokal. 🇮🇩
+**Desa Digital** - Membangun Indonesia melalui digitalisasi produk desa dan pemberdayaan UMKM
