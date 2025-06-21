@@ -81,21 +81,50 @@ cd backend
 npm run seed
 ```
 
-## 🌐 Environment Variables
+## 🗝️ Pengaturan Environment
 
-### Backend (.env)
-```env
-PORT=5000
-NODE_ENV=development
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/desa_digital
-```
+### Backend: `.env`
 
-### Frontend (.env.local)
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-NEXT_PUBLIC_APP_NAME=Desa Digital
-NEXT_PUBLIC_APP_DESCRIPTION=Platform digitalisasi produk desa dan UMKM Indonesia
-```
+1. **Salin file contoh:**
+   ```bash
+   cp .env.example .env
+   ```
+2. **Edit file `.env`** di folder `backend` dan isi dengan konfigurasi MongoDB Atlas Anda:
+   ```env
+   PORT=5000
+   NODE_ENV=development
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/desa_digital
+   ```
+   > **Catatan:** Proyek ini menggunakan **MongoDB** sebagai database utama. Pastikan Anda sudah memiliki akun dan cluster di MongoDB Atlas.
+
+---
+
+### Frontend: `.env.local` dan `next-env.d.ts`
+
+1. **Salin file contoh:**
+   ```bash
+   cp .env.local.example .env.local
+   ```
+2. **Edit file `.env.local`** di folder `frontend` dan sesuaikan URL API backend:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000/api
+   NEXT_PUBLIC_APP_NAME=Desa Digital
+   NEXT_PUBLIC_APP_DESCRIPTION=Platform digitalisasi produk desa dan UMKM Indonesia
+   ```
+
+3. **Pastikan file `next-env.d.ts` ada di folder `frontend`** (buat jika belum ada):
+   ```typescript
+   // frontend/next-env.d.ts
+   /// <reference types="next" />
+   /// <reference types="next/types/global" />
+   /// <reference types="next/image-types/global" />
+
+   // CATATAN: File ini tidak perlu diedit
+   ```
+
+---
+
+> **Penting:** Semua konfigurasi environment harus diisi dengan benar agar aplikasi berjalan optimal. Database yang digunakan adalah **MongoDB**.
 
 ## 🚀 Menjalankan Aplikasi
 
