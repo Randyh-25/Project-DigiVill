@@ -361,7 +361,20 @@ export default function AdminDashboard() {
                           <button className="p-1 text-gray-400 hover:text-blue-600">
                             <Edit className="h-4 w-4" />
                           </button>
-                          <button className="p-1 text-gray-400 hover:text-red-600">
+                          <button
+                            className="p-1 text-gray-400 hover:text-red-600"
+                            onClick={async () => {
+                              if (!confirm("Yakin hapus UMKM ini?")) return;
+                              const token = localStorage.getItem("admin_token");
+                              await fetch(`${process.env.NEXT_PUBLIC_API_URL}/umkm/${umkm._id}`, {
+                                method: "DELETE",
+                                headers: { Authorization: `Bearer ${token}` },
+                              });
+                              // Refresh data dashboard
+                              fetchDashboardData();
+                            }}
+                            title="Hapus"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
