@@ -1,5 +1,6 @@
 // frontend/app/admin/register/page.tsx
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -12,17 +13,6 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const router = useRouter();
-
-    useEffect(() => {
-        const token =
-            typeof window !== "undefined"
-                ? localStorage.getItem("admin_token")
-                : null;
-        if (!token) {
-            router.replace("/admin/login");
-        }
-        // ...fetch data, dsb
-    }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

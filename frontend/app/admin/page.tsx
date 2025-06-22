@@ -31,6 +31,7 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState([]);
+  const [detailRequest, setDetailRequest] = useState<any>(null);
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
@@ -444,6 +445,12 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex gap-2">
                       <button
+                        className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 mr-2"
+                        onClick={() => setDetailRequest(req)}
+                      >
+                        Detail
+                      </button>
+                      <button
                         className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
                         onClick={async () => {
                           const token = localStorage.getItem("admin_token");
@@ -482,6 +489,43 @@ export default function AdminDashboard() {
             )}
           </div>
         </div>
+
+        {detailRequest && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
+              <button
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                onClick={() => setDetailRequest(null)}
+              >
+                <span className="text-xl">&times;</span>
+              </button>
+              <h3 className="text-xl font-bold mb-4">Detail Pengajuan</h3>
+              <div className="space-y-2">
+                <div><span className="font-semibold">Tipe:</span> {detailRequest.type}</div>
+                <div><span className="font-semibold">Nama:</span> {detailRequest.data?.name}</div>
+                {detailRequest.data?.description && (
+                  <div><span className="font-semibold">Deskripsi:</span> {detailRequest.data.description}</div>
+                )}
+                {detailRequest.data?.category && (
+                  <div><span className="font-semibold">Kategori:</span> {detailRequest.data.category}</div>
+                )}
+                {detailRequest.data?.village && (
+                  <div><span className="font-semibold">Desa:</span> {detailRequest.data.village}</div>
+                )}
+                {detailRequest.data?.price && (
+                  <div><span className="font-semibold">Harga:</span> {detailRequest.data.price}</div>
+                )}
+                {detailRequest.data?.unit && (
+                  <div><span className="font-semibold">Satuan:</span> {detailRequest.data.unit}</div>
+                )}
+                {detailRequest.data?.contact?.name && (
+                  <div><span className="font-semibold">Kontak:</span> {detailRequest.data.contact.name} ({detailRequest.data.contact.phone})</div>
+                )}
+                <div><span className="font-semibold">Diajukan oleh:</span> {detailRequest.user?.name || detailRequest.user?.username}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
