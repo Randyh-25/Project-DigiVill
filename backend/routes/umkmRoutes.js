@@ -61,8 +61,8 @@ router.get('/categories', getCategories);
 router.get('/', getUMKMs);
 router.get('/:id', getUMKM);
 router.post('/', umkmValidation, createUMKM);
-router.put('/:id', umkmValidation, updateUMKM);
-router.delete('/:id', deleteUMKM);
+router.put('/:id', auth, updateUMKM);      // Edit UMKM
+router.delete('/:id', auth, deleteUMKM);   // Hapus UMKM
 router.get('/user', auth, getUserUMKM);
 
 module.exports = router;

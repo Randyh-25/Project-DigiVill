@@ -23,16 +23,18 @@ export default function AddUserProduct() {
   const router = useRouter();
 
   const categories = [
-    "Pangan",
+    "Pertanian",
+    "Perkebunan",
+    "Perikanan",
+    "Peternakan",
     "Kerajinan",
-    "Jasa",
-    "Teknologi",
+    "Makanan",
     "Lainnya"
   ];
 
-  const units = [
-    "Kg", "Ton", "Liter", "Pcs", "Unit", "Lainnya"
-  ];
+  const units = ["kg", "gram", "liter", "pcs", "pack", "dozen"];
+
+  const harvestSeasons = ["Musim Hujan", "Musim Kemarau", "Sepanjang Tahun"];
 
   const validate = () => {
     const newErrors: any = {};
@@ -138,14 +140,17 @@ export default function AddUserProduct() {
           </div>
           <div>
             <label className="block font-medium mb-1">Musim Panen</label>
-            <input
-              type="text"
+            <select
               name="harvestSeason"
               className="w-full border px-4 py-2 rounded-lg"
               value={formData.harvestSeason}
               onChange={handleChange}
-              placeholder="Contoh: Juni-Agustus"
-            />
+            >
+              <option value="">Pilih Musim Panen</option>
+              {harvestSeasons.map((season) => (
+                <option key={season} value={season}>{season}</option>
+              ))}
+            </select>
           </div>
           <div className="flex gap-2">
             <div className="flex-1">

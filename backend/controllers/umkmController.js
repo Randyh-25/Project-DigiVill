@@ -104,68 +104,22 @@ const createUMKM = async (req, res) => {
 // Update UMKM
 const updateUMKM = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const umkm = await UMKM.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!umkm) {
-      return res.status(404).json({
-        success: false,
-        message: 'UMKM not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'UMKM updated successfully',
-      data: umkm
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Error updating UMKM',
-      error: error.message
-    });
+    const updated = await UMKM.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ success: false, message: 'UMKM tidak ditemukan' });
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Gagal update UMKM' });
   }
 };
 
 // Delete UMKM
 const deleteUMKM = async (req, res) => {
   try {
-    const umkm = await UMKM.findByIdAndUpdate(
-      req.params.id,
-      { isActive: false },
-      { new: true }
-    );
-
-    if (!umkm) {
-      return res.status(404).json({
-        success: false,
-        message: 'UMKM not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'UMKM deleted successfully'
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error deleting UMKM',
-      error: error.message
-    });
+    const deleted = await UMKM.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ success: false, message: 'UMKM tidak ditemukan' });
+    res.json({ success: true, message: 'UMKM dihapus' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Gagal hapus UMKM' });
   }
 };
 

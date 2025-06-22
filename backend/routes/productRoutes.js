@@ -61,8 +61,8 @@ router.get('/categories', getCategories);
 router.get('/', getProducts);
 router.get('/:id', getProduct);
 router.post('/', productValidation, createProduct);
-router.put('/:id', productValidation, updateProduct);
-router.delete('/:id', deleteProduct);
+router.put('/:id', auth, updateProduct);      // Edit produk
+router.delete('/:id', auth, deleteProduct);   // Hapus produk
 router.get('/user', auth, getUserProducts);
 
 module.exports = router;

@@ -272,10 +272,27 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <button className="p-1 text-gray-400 hover:text-blue-600">
+                          <button
+                            className="p-1 text-gray-400 hover:text-blue-600"
+                            onClick={() => router.push(`/admin/edit-product/${product._id}`)}
+                            title="Edit"
+                          >
                             <Edit className="h-4 w-4" />
                           </button>
-                          <button className="p-1 text-gray-400 hover:text-red-600">
+                          <button
+                            className="p-1 text-gray-400 hover:text-red-600"
+                            onClick={async () => {
+                              if (!confirm("Yakin hapus produk ini?")) return;
+                              const token = localStorage.getItem("admin_token");
+                              await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${product._id}`, {
+                                method: "DELETE",
+                                headers: { Authorization: `Bearer ${token}` },
+                              });
+                              // Refresh data produk
+                              setProducts((prev) => prev.filter((p) => p._id !== product._id));
+                            }}
+                            title="Hapus"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
@@ -429,7 +446,7 @@ export default function AdminDashboard() {
                       <button
                         className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
                         onClick={async () => {
-                          const token = localStorage.getItem("token");
+                          const token = localStorage.getItem("admin_token");
                           await fetch(`${process.env.NEXT_PUBLIC_API_URL}/uploadrequests/${req._id}/approve`, {
                             method: "POST",
                             headers: { Authorization: `Bearer ${token}` },
@@ -444,7 +461,7 @@ export default function AdminDashboard() {
                         onClick={async () => {
                           const reason = prompt("Alasan penolakan?");
                           if (!reason) return;
-                          const token = localStorage.getItem("token");
+                          const token = localStorage.getItem("admin_token");
                           await fetch(`${process.env.NEXT_PUBLIC_API_URL}/uploadrequests/${req._id}/reject`, {
                             method: "POST",
                             headers: {
