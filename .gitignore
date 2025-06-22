@@ -30,11 +30,10 @@ yarn-error.log*
 
 # local env files (root, frontend, backend)
 .env
-.env.*
+
 .env.local
 .env.*.local
 /frontend/.env
-/frontend/.env.*
 /frontend/.env.local
 /frontend/.env.*.local
 /backend/.env
