@@ -25,7 +25,7 @@ export default function AddUMKM() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    logo: '',
+    logo: '', // akan diisi path hasil upload
     category: '',
     village: '',
     establishedYear: '',
@@ -43,6 +43,28 @@ export default function AddUMKM() {
       website: ''
     }
   });
+
+  // Handler upload logo
+  const handleLogoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const form = new FormData();
+    form.append('image', file);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/umkm/upload-image`, {
+        method: 'POST',
+        body: form,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setFormData((prev) => ({ ...prev, logo: data.url }));
+      } else {
+        setError('Gagal upload logo');
+      }
+    } catch (err) {
+      setError('Gagal upload logo');
+    }
+  };
 
   const [errors, setErrors] = useState({});
 
@@ -281,18 +303,19 @@ export default function AddUMKM() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    URL Logo
+                    Upload Logo UMKM
                   </label>
                   <input
-                    type="url"
-                    name="logo"
-                    value={formData.logo}
-                    onChange={handleInputChange}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="https://example.com/logo.jpg"
                   />
+                  {formData.logo && (
+                    <img src={`${process.env.NEXT_PUBLIC_API_URL}${formData.logo}`} alt="Logo Preview" className="h-16 mt-2 rounded" />
+                  )}
                   <p className="text-gray-500 text-xs mt-1">
-                    Opsional: Masukkan URL logo UMKM dari internet
+                    Upload gambar logo UMKM. File akan disimpan di server.
                   </p>
                 </div>
 

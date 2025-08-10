@@ -62,6 +62,27 @@ export default function AddUserProduct() {
     if (errors[name]) setErrors((prev: any) => ({ ...prev, [name]: "" }));
   };
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const form = new FormData();
+    form.append('image', file);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/upload-image`, {
+        method: 'POST',
+        body: form,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setFormData((prev) => ({ ...prev, image: data.url }));
+      } else {
+        setError('Gagal upload gambar');
+      }
+    } catch (err) {
+      setError('Gagal upload gambar');
+    }
+  };
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!validate()) return;
@@ -128,15 +149,21 @@ export default function AddUserProduct() {
             />
           </div>
           <div>
-            <label className="block font-medium mb-1">URL Gambar</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Upload Gambar Produk
+            </label>
             <input
-              type="url"
-              name="image"
-              className="w-full border px-4 py-2 rounded-lg"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="https://..."
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
+            {formData.image && (
+              <img src={`${process.env.NEXT_PUBLIC_API_URL}${formData.image}`} alt="Preview" className="h-16 mt-2 rounded" />
+            )}
+            <p className="text-gray-500 text-xs mt-1">
+              Upload gambar produk. File akan disimpan di server.
+            </p>
           </div>
           <div>
             <label className="block font-medium mb-1">Musim Panen</label>

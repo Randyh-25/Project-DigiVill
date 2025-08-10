@@ -10,6 +10,7 @@ const {
   getUserProducts
 } = require('../controllers/productController');
 const auth = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -64,5 +65,12 @@ router.post('/', productValidation, createProduct);
 router.put('/:id', auth, updateProduct);      // Edit produk
 router.delete('/:id', auth, deleteProduct);   // Hapus produk
 router.get('/user', auth, getUserProducts);
+
+// Endpoint upload gambar produk
+router.post('/upload-image', upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
+  // Cloudinary menyimpan url di req.file.path
+  res.json({ success: true, url: req.file.path });
+});
 
 module.exports = router;

@@ -47,10 +47,10 @@ export default function Home() {
 
       // Mock stats for now
       setStats({
-        products: 1250,
-        umkm: 340,
-        villages: 89,
-        users: 2100
+        products: 5,
+        umkm: 20,
+        villages: 1,
+        users: 150
       });
     } catch (error) {
       console.error('Error fetching featured data:', error);

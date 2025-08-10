@@ -10,6 +10,7 @@ const {
   getUserUMKM
 } = require('../controllers/umkmController');
 const auth = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -64,5 +65,12 @@ router.post('/', umkmValidation, createUMKM);
 router.put('/:id', auth, updateUMKM);      // Edit UMKM
 router.delete('/:id', auth, deleteUMKM);   // Hapus UMKM
 router.get('/user', auth, getUserUMKM);
+
+// Endpoint upload gambar UMKM
+router.post('/upload-image', upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
+  // Cloudinary menyimpan url di req.file.path
+  res.json({ success: true, url: req.file.path });
+});
 
 module.exports = router;
