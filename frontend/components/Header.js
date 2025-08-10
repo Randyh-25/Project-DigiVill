@@ -135,13 +135,11 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className="bg-gradient-to-r from-green-500 to-green-600 p-2 rounded-lg group-hover:from-green-600 group-hover:to-green-700 transition-all duration-200">
-              <Leaf className="h-6 w-6 text-white" />
-            </div>
+            <img src="/lg-gl.png" alt="Logo Desa Digital" className="h-8 w-8" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Desa Digital</h1>
+              <h1 className="text-xl font-bold text-gray-900">Galih Lunik Digital</h1>
               <p className="text-xs text-gray-500 hidden sm:block">
-                Digitalisasi Produk Desa
+                Hasil Panen dan UMKM Galih Lunik
               </p>
             </div>
           </Link>
