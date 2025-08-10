@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  const { username, password, name } = req.body;
+  const { username, password, name, email } = req.body;
   if (!username || !password || !name) {
     return res.status(400).json({ success: false, message: 'Semua field wajib diisi.' });
   }
@@ -38,7 +38,10 @@ exports.register = async (req, res) => {
     return res.status(409).json({ success: false, message: 'Username sudah terdaftar.' });
   }
   const hashed = await bcrypt.hash(password, 10);
-  const user = new User({ username, password: hashed, name });
+  // Hanya tambahkan email jika ada nilainya
+  const userData = { username, password: hashed, name };
+  if (email) userData.email = email;
+  const user = new User(userData);
   await user.save();
   res.json({ success: true, message: 'Registrasi berhasil. Silakan login.' });
 };

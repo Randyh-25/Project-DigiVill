@@ -3,7 +3,7 @@ PORT=5000
 NODE_ENV=development
 JWT_SECRET=secret_key
 # Database Configuration
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.<string>.mongodb.net/desa_digital?retryWrites=true&w=majority&appName=Cluster0
+MONGODB_URI=mongodb+srv://randyhendriyawan99:iqJWGLjq3U4F6F9D@cluster0.<string>.mongodb.net/desa_digital?retryWrites=true&w=majority&appName=Cluster0
 
 # API Configuration
 API_VERSION=v1
